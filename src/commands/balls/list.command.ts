@@ -9,12 +9,20 @@ import { balls } from "../../../balls";
 export class ListCommand extends Command {
   override async run(context: CommandContext) {
     if (!context.member) return;
-    const ballsFetch = database.get_user_balls(Number(context.member.id));
+    const ballsFetch = database.get_user_balls(Number(context.member.id)) as {
+      user_id: number;
+      ball_id: number;
+    }[];
     context.client.logger.info(ballsFetch);
     const ownedBalls = ballsFetch.map((b) => balls[b.ball_id]);
+    if (!ownedBalls) return;
     const message = `Owned balls:\n${
-      ownedBalls.map((b) => `- ${b.name}`).join("\n") ||
-      "You don't own any balls yet."
+      ownedBalls
+        .map((b) => {
+          if (!b) return;
+          `- ${b.name}`;
+        })
+        .join("\n") || "You don't own any balls yet."
     }`;
   }
 }
