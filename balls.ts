@@ -1,11 +1,11 @@
 export const balls = [
   {
-    name: "milkman",
+    name: "MilkMan",
     id: 0,
     file: "balls/milkman.png",
   },
   {
-    name: "roxyy",
+    name: "Roxyy",
     id: 1,
     file: "balls/roxyy.png",
   },
