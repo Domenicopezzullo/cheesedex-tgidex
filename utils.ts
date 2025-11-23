@@ -2,7 +2,10 @@ import { Message, type UsingClient } from "seyfert";
 import { readFile } from "node:fs/promises";
 import { balls } from "./balls";
 import { write } from "bun";
-import { ClaimButtonAR } from "./src/components/ClaimButton";
+import {
+  ClaimButtonAR,
+  ClaimButtonDisabledAR,
+} from "./src/components/ClaimButton";
 import { mkdir } from "node:fs/promises";
 
 // random delay between 30s and 90s
@@ -34,9 +37,8 @@ export const ballGenStart = async (client: UsingClient, channel_id: string) => {
       .then((msg) => {
         setTimeout(() => {
           msg.edit({
-            content: "The ball has disappeared!",
-            components: [],
-            attachments: [],
+            content: "A wild tgiball appeared!",
+            components: [ClaimButtonDisabledAR],
           });
         }, 15000);
       });

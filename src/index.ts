@@ -6,7 +6,7 @@ const client = new Client();
 
 client
   .start()
-  .then(() => client.uploadCommands({ cachePath: "../commands.json" }));
+  .then(() => client.uploadCommands({ cachePath: "./commands.json" }));
 
 export const database = new SQLDatabase("database.db");
 
