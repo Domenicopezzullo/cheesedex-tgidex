@@ -1,13 +1,6 @@
 import { Database } from "bun:sqlite";
 
 export class SQLDatabase {
-  get_all_channels() {
-    const channels = this.database.prepare("select * from channels").all() as {
-      guild_id: number;
-      channel_id: number;
-    }[];
-    return channels.map((e) => e.channel_id);
-  }
   private database: Database;
 
   constructor(path: string) {
@@ -31,7 +24,6 @@ export class SQLDatabase {
     // Balls table: each row is one ball owned by a user
     this.database.run(`
             CREATE TABLE IF NOT EXISTS balls (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER,
                 ball_id INTEGER,
                 FOREIGN KEY(user_id) REFERENCES users(user_id)
@@ -45,6 +37,14 @@ export class SQLDatabase {
             VALUES (?, ?)
         `);
     return stmt.run(guild_id, channel_id);
+  }
+
+  get_all_channels() {
+    const channels = this.database.prepare("select * from channels").all() as {
+      guild_id: number;
+      channel_id: number;
+    }[];
+    return channels.map((e) => e.channel_id);
   }
 
   add_ball(user_id: number, ball_id: number) {
