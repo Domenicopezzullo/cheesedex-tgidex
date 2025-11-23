@@ -9,8 +9,8 @@ export class SQLDatabase {
     // Channels table
     this.database.run(`
             CREATE TABLE IF NOT EXISTS channels (
-                guild_id INTEGER PRIMARY KEY,
-                channel_id INTEGER
+                guild_id TEXT PRIMARY KEY,
+                channel_id TEXT
             )    
         `);
 
@@ -24,14 +24,14 @@ export class SQLDatabase {
     // Balls table: each row is one ball owned by a user
     this.database.run(`
             CREATE TABLE IF NOT EXISTS balls (
-                user_id INTEGER,
+                user_id TEXT,
                 ball_id INTEGER,
                 FOREIGN KEY(user_id) REFERENCES users(user_id)
             )
         `);
   }
 
-  save_channel(guild_id: number, channel_id: number) {
+  save_channel(guild_id: string, channel_id: string) {
     const stmt = this.database.prepare(`
             INSERT OR REPLACE INTO channels (guild_id, channel_id)
             VALUES (?, ?)
@@ -41,13 +41,13 @@ export class SQLDatabase {
 
   get_all_channels() {
     const channels = this.database.prepare("select * from channels").all() as {
-      guild_id: number;
-      channel_id: number;
+      guild_id: string;
+      channel_id: string;
     }[];
-    return channels.map((e) => e.channel_id);
+    return channels.map((c) => c.channel_id);
   }
 
-  add_ball(user_id: number, ball_id: number) {
+  add_ball(user_id: string, ball_id: number) {
     // Ensure user exists
     this.database
       .prepare(
@@ -64,7 +64,7 @@ export class SQLDatabase {
     return stmt.run(user_id, ball_id);
   }
 
-  get_user_balls(user_id: number) {
+  get_user_balls(user_id: string) {
     return this.database
       .query("SELECT ball_id FROM balls WHERE user_id = ?")
       .all(user_id);

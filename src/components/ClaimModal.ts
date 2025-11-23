@@ -38,7 +38,7 @@ export default class ClaimModalHandler extends ModalCommand {
       });
     } else {
       await context.write({ content: `You caught a ${found_ball.name} 🎉` });
-      database.add_ball(Number(context.member.id), found_ball.id);
+      database.add_ball(context.member.id, found_ball.id);
       await unlink(`data/${channel.id}/current_ball`);
     }
   }

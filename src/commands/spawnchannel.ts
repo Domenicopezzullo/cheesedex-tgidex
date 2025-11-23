@@ -19,9 +19,14 @@ const options = {
   description: "Set's the channel where the balls will spawn",
 })
 @Options(options)
-export class SetChannelCommand extends Command {
+export default class SetChannelCommand extends Command {
   override run(ctx: CommandContext<typeof options>) {
     if (!ctx.guildId) return;
-    database.save_channel(Number(ctx.guildId), Number(ctx.options.channel.id));
+    ctx.client.logger.info(ctx.options.channel.id);
+    ctx.client.logger.info(ctx.guildId);
+    database.save_channel(ctx.guildId, ctx.options.channel.id);
+    return ctx.write({
+      content: `Spawn channel set to <#${ctx.options.channel.id}>`,
+    });
   }
 }

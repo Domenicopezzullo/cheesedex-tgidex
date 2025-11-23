@@ -1,4 +1,4 @@
-import { type UsingClient } from "seyfert";
+import { Message, type UsingClient } from "seyfert";
 import { readFile } from "node:fs/promises";
 import { balls } from "./balls";
 import { write } from "bun";
@@ -13,24 +13,36 @@ function randomIntFromInterval(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-export const ballGenStart = async (client: UsingClient, channel_id: number) => {
-  const channel = await client.channels.fetch(String(channel_id));
+export const ballGenStart = async (client: UsingClient, channel_id: string) => {
+  const channel = await client.channels.fetch(channel_id);
   if (!channel?.isTextable()) return;
   await mkdir(`data/${channel.id}`, { recursive: true });
-
   const spawnBall = async () => {
-    const image = await readFile("balls/image.png");
     const ball = balls[randomIntFromInterval(0, 1)];
     if (!ball) return;
+    let buffer: ArrayBuffer = new ArrayBuffer(0);
+    const res = await fetch(ball.file_link);
+    buffer = await res.arrayBuffer();
+    await write(`balls/${ball.name}.png`, Buffer.from(buffer));
     await write(`data/${channel.id}/current_ball`, `${ball.id}`);
-    await channel.messages.write({
-      content: "🎉 A new ball has appeared!",
-      files: [{ data: image, filename: "balls/image.png" }],
-      components: [ClaimButtonAR],
-    });
+    const message = await channel.messages
+      .write({
+        content: "A wild tgiball appeared!",
+        files: [{ data: buffer, filename: ball.file }],
+        components: [ClaimButtonAR],
+      })
+      .then((msg) => {
+        setTimeout(() => {
+          msg.edit({
+            content: "The ball has disappeared!",
+            components: [],
+            attachments: [],
+          });
+        }, 15000);
+      });
 
     // schedule next spawn
-    setTimeout(spawnBall, randomDelay());
+    setInterval(spawnBall, randomDelay());
   };
 
   spawnBall();
