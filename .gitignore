@@ -1,0 +1,4 @@
+.env
+database.db
+bun.lock
+node_modules
