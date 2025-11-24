@@ -9,7 +9,6 @@ export class ListCommand extends SubCommand {
   override async run(context: CommandContext) {
     if (!context.member) return;
     const ballsFetch = context.client.db.get_user_balls(context.member.id) as {
-      user_id: number;
       ball_id: number;
     }[];
     context.client.logger.info(ballsFetch);
@@ -18,11 +17,13 @@ export class ListCommand extends SubCommand {
       return;
     }
     const userBalls = ballsFetch.map((b) => {
-      const found_ball = balls.find((ball) => ball.id === b.ball_id);
-      return found_ball ? found_ball.name : `Unknown Ball (ID: ${b.ball_id})`;
+      const foundBall = balls.find((ball) => ball.id === b.ball_id);
+      if (!foundBall) return `Unknown Ball (ID: ${b.ball_id})`;
+      return `${foundBall.name} (Health: ${foundBall.health})`;
     });
+
     await context.write({
-      content: `Your balls: \n\\- ${userBalls.join("\n\\- ")}`,
+      content: `Your balls:\n\\- ${userBalls.join("\n\\- ")}`,
     });
   }
 }
