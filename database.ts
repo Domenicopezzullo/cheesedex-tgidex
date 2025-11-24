@@ -8,11 +8,13 @@ export class SQLDatabase {
 
     // Channels table
     this.database.run(`
-            CREATE TABLE IF NOT EXISTS channels (
-                guild_id TEXT PRIMARY KEY,
-                channel_id TEXT
-            )    
-        `);
+    CREATE TABLE IF NOT EXISTS channels (
+        channel_id TEXT PRIMARY KEY,
+        guild_id TEXT,
+        message_goal INTEGER,
+        message_count INTEGER DEFAULT 0
+    )    
+  `);
 
     // Users table
     this.database.run(`
@@ -37,6 +39,63 @@ export class SQLDatabase {
             VALUES (?, ?)
         `);
     return stmt.run(guild_id, channel_id);
+  }
+
+  set_goal(channel_id: string, message_goal: number) {
+    // First, ensure the row exists
+    const insertStmt = this.database.prepare(`
+        INSERT OR IGNORE INTO channels (channel_id, message_count)
+        VALUES (?, 0)
+    `);
+    insertStmt.run(channel_id);
+
+    // Then update the goal
+    const updateStmt = this.database.prepare(`
+        UPDATE channels
+        SET message_goal = ?
+        WHERE channel_id = ?
+    `);
+    return updateStmt.run(message_goal, channel_id);
+  }
+
+  get_message_count(channel_id: string) {
+    const stmt = this.database.prepare(`
+            SELECT message_count FROM channels WHERE channel_id = ?
+        `);
+    const res = stmt.get(channel_id) as { message_count: number };
+    return res?.message_count;
+  }
+  set_message_count(channel_id: string, message_count: number) {
+    // First, ensure the row exists
+    const insertStmt = this.database.prepare(`
+        INSERT OR IGNORE INTO channels (channel_id, message_goal)
+        VALUES (?, NULL)
+    `);
+    insertStmt.run(channel_id);
+
+    // Then update the count
+    const updateStmt = this.database.prepare(`
+        UPDATE channels
+        SET message_count = ?
+        WHERE channel_id = ?
+    `);
+    return updateStmt.run(message_count, channel_id);
+  }
+
+  get_goal(channel_id: string) {
+    const stmt = this.database.prepare(`
+            SELECT message_goal FROM channels WHERE channel_id = ?
+        `);
+    const res = stmt.get(channel_id) as { message_goal: number };
+    return res?.message_goal;
+  }
+
+  is_goal_present(channel_id: string) {
+    const stmt = this.database.prepare(`
+            SELECT 1 FROM channels WHERE channel_id = ? AND message_goal IS NOT NULL
+        `);
+    const res = stmt.get(channel_id);
+    return !!res;
   }
 
   get_all_channels() {
