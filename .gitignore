@@ -2,3 +2,6 @@
 database.db
 bun.lock
 node_modules
+balls
+dist
+commands.json

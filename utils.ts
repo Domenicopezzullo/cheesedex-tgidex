@@ -10,7 +10,7 @@ import { mkdir } from "node:fs/promises";
 import { unlink } from "node:fs/promises";
 
 // random delay between 30s and 90s
-const randomDelay = () => Math.floor(Math.random() * 60000) + 30000;
+const randomDelay = () => Math.floor(Math.random() * 60000) + 30000 * 15;
 
 function randomIntFromInterval(min: number, max: number) {
   // min and max included
