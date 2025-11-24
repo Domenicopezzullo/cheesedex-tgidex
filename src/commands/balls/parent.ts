@@ -1,6 +1,5 @@
 import { Declare, Command, Options, AutoLoad, CommandContext } from "seyfert";
 import { ListCommand } from "./list.command";
-import { database } from "../..";
 
 @Declare({
   name: "balls",

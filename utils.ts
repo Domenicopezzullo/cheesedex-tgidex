@@ -7,6 +7,7 @@ import {
   ClaimButtonDisabledAR,
 } from "./src/components/ClaimButton";
 import { mkdir } from "node:fs/promises";
+import { unlink } from "node:fs/promises";
 
 // random delay between 30s and 90s
 const randomDelay = () => Math.floor(Math.random() * 60000) + 30000;
@@ -27,19 +28,20 @@ export const ballGenStart = async (client: UsingClient, channel_id: string) => {
     const res = await fetch(ball.file_link);
     buffer = await res.arrayBuffer();
     await write(`balls/${ball.name}.png`, Buffer.from(buffer));
-    await write(`data/${channel.id}/current_ball`, `${ball.id}`);
     const message = await channel.messages
       .write({
         content: "A wild tgiball appeared!",
         files: [{ data: buffer, filename: ball.file }],
         components: [ClaimButtonAR],
       })
-      .then((msg) => {
-        setTimeout(() => {
+      .then(async (msg) => {
+        await write(`data/${channel.id}/current_ball`, `${ball.id}|${msg.id}`);
+        setTimeout(async () => {
           msg.edit({
             content: "A wild tgiball appeared!",
             components: [ClaimButtonDisabledAR],
           });
+          await unlink(`data/${channel.id}/current_ball`);
         }, 15000);
       });
 

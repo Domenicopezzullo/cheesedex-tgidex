@@ -1,5 +1,4 @@
 import { Declare, CommandContext, SubCommand } from "seyfert";
-import { database } from "../..";
 import { balls } from "../../../balls";
 
 @Declare({
@@ -9,7 +8,7 @@ import { balls } from "../../../balls";
 export class ListCommand extends SubCommand {
   override async run(context: CommandContext) {
     if (!context.member) return;
-    const ballsFetch = database.get_user_balls(context.member.id) as {
+    const ballsFetch = context.client.db.get_user_balls(context.member.id) as {
       user_id: number;
       ball_id: number;
     }[];

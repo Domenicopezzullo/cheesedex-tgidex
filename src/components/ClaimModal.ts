@@ -1,8 +1,8 @@
 import { Label, Modal, ModalCommand, ModalContext, TextInput } from "seyfert";
 import { TextInputStyle } from "seyfert/lib/types";
 import { balls } from "../../balls";
-import { database } from "..";
 import { unlink } from "node:fs/promises";
+import { ClaimButtonDisabledAR } from "./ClaimButton";
 
 const nameText = new TextInput({
   style: TextInputStyle.Short,
@@ -27,7 +27,10 @@ export default class ClaimModalHandler extends ModalCommand {
     if (!context.member) return;
     const channel = await context.channel("rest");
     const name = context.interaction.getInputValue("nameofdaball") as string;
-    const text = await Bun.file("data/" + channel.id + "/current_ball").text();
+    const text = (
+      await Bun.file("data/" + channel.id + "/current_ball").text()
+    ).split("|")[0];
+    if (!text) return;
     const found_ball = balls.find((b) => b.id == Number(text));
     if (
       found_ball === undefined ||
@@ -38,7 +41,15 @@ export default class ClaimModalHandler extends ModalCommand {
       });
     } else {
       await context.write({ content: `You caught a ${found_ball.name} 🎉` });
-      database.add_ball(context.member.id, found_ball.id);
+      context.client.db.add_ball(context.member.id, found_ball.id);
+      const msg_id = (
+        await Bun.file("data/" + channel.id + "/current_ball").text()
+      ).split("|")[1];
+      if (!msg_id) return;
+      const msg = await context.client.messages.fetch(msg_id, channel.id);
+      await msg.edit({
+        components: [ClaimButtonDisabledAR],
+      });
       await unlink(`data/${channel.id}/current_ball`);
     }
   }

@@ -8,8 +8,8 @@ client
   .start()
   .then(() => client.uploadCommands({ cachePath: "./commands.json" }));
 
-export const database = new SQLDatabase("database.db");
-
 declare module "seyfert" {
-  interface UsingClient extends ParseClient<Client<true>> {} // Gateway
+  interface UsingClient extends ParseClient<Client<true>> {
+    db: SQLDatabase;
+  } // Gateway
 }
