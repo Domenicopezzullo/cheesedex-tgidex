@@ -16,7 +16,7 @@ export class ListCommand extends SubCommand {
       await context.write({ content: "You have no balls!" });
       return;
     }
-    const userBalls = ballsFetch.map((b) => {
+    const userBalls = ballsFetch.map(b => {
       const foundBall = balls.find((ball) => ball.id === b.ball_id);
       if (!foundBall) return `Unknown Ball (ID: ${b.ball_id})`;
       return `${foundBall.name} (Health: ${foundBall.health})`;

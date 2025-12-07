@@ -5,7 +5,7 @@ export const balls = [
     file_link:
       "https://cdn.discordapp.com/guilds/1146138030982299729/users/985770887028568115/avatars/b79f4a0cdc88159153f2f343f1cfcd3a.png?size=4096",
     file: "balls/milkman.png",
-    milkman: 1000,
+    health: 1000,
   },
   {
     name: "Roxyy",
